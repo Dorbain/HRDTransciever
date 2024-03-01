@@ -19,6 +19,7 @@ namespace HRDLib
         internal static bool Connection = false;
         internal static byte[] composeSendMessage(string _hrdmessage)
         {
+           
             // convert the string into unicode byte array
             byte[] ba = Encoding.Unicode.GetBytes(_hrdmessage);
             // someting to add unclear why
@@ -61,7 +62,6 @@ namespace HRDLib
 
 
     }
-
 
     public static class HRD
     {

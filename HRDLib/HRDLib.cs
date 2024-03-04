@@ -38,178 +38,26 @@ namespace HRDLib
         public static List<string> dropdownLists = new List<string>();
         public static List<string> dropdownTexts = new List<string>();
     }
-
-
-
-
     
-    
-
-    internal static class HRDinitialize
-    {
-        internal static void Start()
-        {
-            if (!Directory.Exists(HRDinternal.Folder))
-            {
-                Directory.CreateDirectory(HRDinternal.Folder);
-            }
-            if(File.Exists(HRDinternal.logFileName))
-            {
-                File.Move(HRDinternal.logFileName, HRDinternal.logFileName + DateTime.Now.ToString("hhmmss"));
-            }
-            else if(!File.Exists(HRDinternal.logFileName))
-            {
-                WriteLog.log("");
-            }
-            WriteLog.log("Start...");
-        }
-        internal static class Get
-        {
-            internal static void Context()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get context");
-                HRD.context = Int32.Parse(new string(HRDinternal.readMessage(HRDinternal.Stream).Where(c => char.IsDigit(c)).ToArray()));
-                //HRD.context = HRDinternal.readMessage(HRDinternal.Stream);
-            }
-
-            internal static void ID()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get id");
-                HRD.id = HRDinternal.readMessage(HRDinternal.Stream);
-            }
-
-            internal static void Version()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get version");
-                string[] version = HRDinternal.readMessage(HRDinternal.Stream).Split(' ');
-                HRD.version = version[0];
-                HRD.build = version[1];
-            }
-
-            internal static void Radios()
-            {
-                // can be more radios, only one connected need to figure out more.
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get radios");
-                HRD.radios = HRDinternal.readMessage(HRDinternal.Stream);
-
-            }
-
-            internal static void Radio()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get radio");
-                HRD.radio = HRDinternal.readMessage(HRDinternal.Stream);
-            }
-
-            internal static void VFOcount()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get vfo-count");
-                HRD.vfoCount = Int32.Parse(new string(HRDinternal.readMessage(HRDinternal.Stream).Where(c => char.IsDigit(c)).ToArray()));
-            }
-
-            internal static void Frequency()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get frequency");
-                HRD.frequency = HRDinternal.readMessage(HRDinternal.Stream);
-            }
-
-            internal static void Frequencies()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get frequencies");
-                HRD.frequencies = HRDinternal.readMessage(HRDinternal.Stream);
-                if (HRD.vfoCount >= 2)
-                {
-                    string[] split = HRD.frequencies.Split('-');
-                    HRD.vfoAfrequency = split[0];
-                    HRD.vfoBfrequency = split[1];
-                }
-            }
-
-            internal static void Buttons()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get buttons");
-                string[] buttons = HRDinternal.readMessage(HRDinternal.Stream).Split(',');
-                HRD.buttons = buttons.ToList();
-                //("get button-select " + buttons_.value (button_index)) to see if button is selected foreach loop through the buttons list
-            }
-
-            internal static void DropdownNames()
-            {
-                WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
-                HRDConnection.Write("get dropdowns");
-                string[] dropdownNames = HRDinternal.readMessage(HRDinternal.Stream).Split(',');
-                HRD.dropdownNames = dropdownNames.ToList();
-                foreach(string dropdownName in HRD.dropdownNames)
-                {
-                    HRDConnection.Write("get dropdown-list {" + dropdownName + "}");
-                    HRD.dropdownLists.Add(HRDinternal.readMessage(HRDinternal.Stream));
-                }
-                foreach (string dropdownName in HRD.dropdownNames)
-                {
-                    HRDConnection.Write("get dropdown-text {" + dropdownName + "}");
-                    HRD.dropdownTexts.Add(HRDinternal.readMessage(HRDinternal.Stream));
-                }
-
-                ////("get dropdown-list {" + dd + "}")
-                ////("get dropdown-text {" + dd_name + "}")
-            }
-
-
-
-
-
-            //comm("get sliders", HRDstream);
-            ////("get slider-range " + current_radio_name + " " + s)
-
-
-
-
-
-
-        }
-    }
 
     public static class Get
     {
 
 
-
-
-
     }
 
-    public static class WriteLog
+    public static class Set
     {
-        internal static void log(string text)
-        {
-            string dtprefix = DateTime.Now.Day.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "|" + DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString() + ":" + DateTime.Now.Second.ToString() + ":" + DateTime.Now.Millisecond.ToString();
-            if (!HRDinternal.debug)
-            {
-                string logprefix = " LOG: ";
-                using (StreamWriter writer = File.AppendText(HRDinternal.logFileName))
-                {
-                    writer.WriteLine(dtprefix + logprefix + text);
-                }
-            }
-            else if (HRDinternal.debug)
-            {
-                string logprefix = " DEBUG: ";
-                    using (StreamWriter writer = File.AppendText(HRDinternal.logFileName))
-                    {
-                        writer.WriteLine(dtprefix + logprefix + text);
-                    }
-            }
-        }
+        //"set frequency-hz " + QString::number (f)
+        //"set frequencies-hz " + QString::number(frequencies[0].toUInt()) + ' ' + fo_string)
+        //"set dropdown " + dd_name.replace (' ', '~') + ' ' + dropdowns_.value (dd_name).value (value).replace (' ', '~') + ' ' + QString::number (value)
+        //"set button-select " + buttons_.value (button_index) + (checked ? " 1" : " 0")
+
     }
-    
+
+
+
+
 
 }
 

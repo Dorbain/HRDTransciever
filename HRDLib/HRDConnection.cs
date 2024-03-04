@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HRDLib;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -26,24 +27,42 @@ namespace HRDLib
         /// <summary>
         /// Opens the connection.
         /// </summary>
-        /// <returns>Returns a stream</returns>
-        public static void Connect()
+        /// <returns>Returns true if connection is succesful.</returns>
+        public static bool Connect()
         {
             HRDinitialize.Start();
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             if (!HRDinternal.Connection)
             {
-                HRDinternal.Client.Connect(Address, Port);
-                HRDinternal.Stream = HRDinternal.Client.GetStream();
-                HRDinternal.Connection = true;
+                try
+                {
+                    HRDinternal.Client.Connect(Address, Port);
+                }
+                catch (Exception ex)
+                { 
+                    HRDinternal.WriteLog.error(ex.ToString());
+                    throw;
+                }
+                try
+                {
+                    HRDinternal.Stream = HRDinternal.Client.GetStream();
+                    HRDinternal.Connection = true;
+                }
+                catch (Exception ex)
+                {
+                    HRDinternal.WriteLog.error(ex.ToString());
+                    throw;
+                }
+                return true;
             }
+            return false;
         }
         /// <summary>
         /// Gets the first data from HRD when the connection is succesfully opened.
         /// </summary>
         public static void Initialize()
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             // we should get the data here from Ham Radio Deluxe first and add those into the items.
             HRDinitialize.Get.Context();
             HRDinitialize.Get.ID();
@@ -61,7 +80,7 @@ namespace HRDLib
         /// </summary>
         public static void Close()
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             if (HRDinternal.Connection)
             {
                 HRDinternal.poll.Stop();
@@ -77,7 +96,7 @@ namespace HRDLib
         /// </summary>
         public static void Renew()
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             if (!HRDinternal.Connection)
             {
                 HRDinternal.Client = new TcpClient();
@@ -100,9 +119,18 @@ namespace HRDLib
         }
         internal static void Write(string message)
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            HRDinternal.WriteLog.log(message);
             byte[] messageToSend = HRDinternal.composeSendMessage(message);
-            HRDinternal.Stream.Write(messageToSend, 0, messageToSend.Length);
+            try
+            {
+                HRDinternal.Stream.Write(messageToSend, 0, messageToSend.Length);
+            }
+            catch (Exception ex)
+            {
+                HRDinternal.WriteLog.error(ex.ToString());
+                throw;
+            }
         }
     }
 }

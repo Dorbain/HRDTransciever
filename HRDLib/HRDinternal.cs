@@ -17,7 +17,7 @@ namespace HRDLib
         internal static System.Timers.Timer poll = new System.Timers.Timer();
         internal static byte[] composeSendMessage(string _hrdmessage)
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            //WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             // convert the string into unicode byte array
             byte[] hrdMessage = Encoding.Unicode.GetBytes(_hrdmessage);
             // Get the size of the message string for payload calculation
@@ -49,7 +49,7 @@ namespace HRDLib
 
         internal static byte[] CombineByteArrays(byte[] original, byte[] toAppend)
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            //WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             var bytes = original.ToList();
             bytes.InsertRange(original.Length, toAppend);
             return bytes.ToArray();
@@ -57,18 +57,52 @@ namespace HRDLib
 
         internal static string readMessage(Stream stream)
         {
-            WriteLog.log(System.Reflection.MethodBase.GetCurrentMethod().Name);
+            //WriteLog.debug(System.Reflection.MethodBase.GetCurrentMethod().Name);
             string returnText = string.Empty;
             byte[] bytesToRead = new byte[2048]; // Asuming a MTU size of 1500 so 2048 should be enough.
             int totalBytesRead = stream.Read(bytesToRead, 0, 2048);
-
-
             for (int i = 14; i < totalBytesRead; i++)
                 returnText = returnText + Convert.ToChar(bytesToRead[i]);
-
+            WriteLog.debug(returnText.ToString());
             return returnText.ToString();
         }
         internal static readonly string Folder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + "\\HRDlib\\";
         internal static readonly string logFileName = Path.Combine(Folder, "HRDCommLog-" + DateTime.Now.ToString("MMddyyyy") + ".log");
+
+        internal static class WriteLog
+        {
+            internal static void log(string text)
+            {
+                string dtprefix = DateTime.Now.Day.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "|" + DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString() + ":" + DateTime.Now.Second.ToString() + ":" + DateTime.Now.Millisecond.ToString();
+                    string logprefix = " LOG: ";
+                    using (StreamWriter writer = File.AppendText(HRDinternal.logFileName))
+                    {
+                        writer.WriteLine(dtprefix + logprefix + text);
+                    }
+            }
+            internal static void debug(string text)
+            {
+                string dtprefix = DateTime.Now.Day.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "|" + DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString() + ":" + DateTime.Now.Second.ToString() + ":" + DateTime.Now.Millisecond.ToString();
+                if (HRDinternal.debug)
+                {
+                    string logprefix = " DEBUG: ";
+                    using (StreamWriter writer = File.AppendText(HRDinternal.logFileName))
+                    {
+                        writer.WriteLine(dtprefix + logprefix + text);
+                    }
+                }
+            }
+
+            internal static void error(string text)
+            {
+                string dtprefix = DateTime.Now.Day.ToString() + "-" + DateTime.Now.Month.ToString() + "-" + DateTime.Now.Year.ToString() + "|" + DateTime.Now.Hour.ToString() + ":" + DateTime.Now.Minute.ToString() + ":" + DateTime.Now.Second.ToString() + ":" + DateTime.Now.Millisecond.ToString();
+                    string logprefix = " ERROR: ";
+                    using (StreamWriter writer = File.AppendText(HRDinternal.logFileName))
+                    {
+                        writer.WriteLine(dtprefix + logprefix + text);
+                    }
+            }
+
+        }
     }
 }

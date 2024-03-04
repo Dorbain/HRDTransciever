@@ -10,7 +10,7 @@ using HRDLib;
 
 namespace Test
 {
-    internal class Program
+    internal static class Program
     {
         static void Main(string[] args)
         {
@@ -19,8 +19,7 @@ namespace Test
             try
             {
                 // Creating the TCP client for Ham Radio Deluxe v5 or v6
-                HRDConnection.Connect();
-                if (HRDConnection.isConnected)
+                if (HRDConnection.Connect())
                 {
                     Console.WriteLine("Connected now get all the data from HRD.");
                     HRDConnection.Initialize();
@@ -52,8 +51,6 @@ namespace Test
                     foreach (string dropdownText in HRD.dropdownTexts)
                     { Console.Write(": " + dropdownText); }
                     //Console.WriteLine(Environment.NewLine + "Dropdowns: " + HRD.dropdowns);
-
-
                 }
                 Console.WriteLine("All done lets close the connection.");
                 HRDConnection.Close();
@@ -63,7 +60,21 @@ namespace Test
                 Console.WriteLine("Error..... " + ex.StackTrace);
             }
             Console.ReadKey();
+
+
+
+
+
+
         }
+
+        public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> source)
+        {
+            return source.Select((item, index) => (item, index));
+        }
+
+
+
 
         //private static void comm(string message, Stream stream)
         //{
@@ -91,10 +102,10 @@ namespace Test
         //    // someting to add unclear why
         //    byte[] magic = new byte[15] { 0x00, 0x00, 0x00, 0xcd, 0xab, 0x34, 0x12, 0x34, 0x12, 0xcd, 0xab, 0x00, 0x00, 0x00, 0x00 };
         //    byte[] theend = new byte[2] { 0x00, 0x00 };
- 
+
         //    var addMagicInFront = AppendInto(ba, magic, 0);
         //    var addTheEndInTheBack = AppendInto(theend, addMagicInFront, 0);
-            
+
         //    // get the whole length of the byte array
         //    int length = addTheEndInTheBack.Length + 1;
         //    // convert the lenght into a byte

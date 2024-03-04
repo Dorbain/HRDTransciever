@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="HRDConnection.cs" />
+    <Compile Include="HRDinternal.cs" />
     <Compile Include="HRDLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -15,15 +15,19 @@ namespace Test
         static void Main(string[] args)
         {
             Console.WriteLine("Connecting to Ham Radio Deluxe.....");
+
             try
             {
                 // Creating the TCP client for Ham Radio Deluxe v5 or v6
                 HRDConnection.Connect();
-                if (HRDConnection.connected)
+                if (HRDConnection.isConnected)
                 {
-                    Console.WriteLine("Connected");
+                    Console.WriteLine("Connected now get all the data from HRD.");
                     HRDConnection.Initialize();
+                    // Successfully Initialized? Then start polling
+                    HRDConnection.Poll();
 
+                    Console.WriteLine("Collected now show us:");
                     Console.WriteLine("Context: " +HRD.context.ToString());
                     Console.WriteLine("ID: " + HRD.id);
                     Console.WriteLine("Version: " + HRD.version);
@@ -51,9 +55,9 @@ namespace Test
 
 
                 }
+                Console.WriteLine("All done lets close the connection.");
                 HRDConnection.Close();
             }
-
             catch (Exception ex)
             {
                 Console.WriteLine("Error..... " + ex.StackTrace);
